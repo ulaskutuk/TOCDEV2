@@ -51,17 +51,37 @@ global class TOC_SalesOrders extends Framework.Domain {
 
     public override void afterUpdate(Map<Id,SObject> oldMap) {
         Framework.Log.push(TOC_SalesOrders.class.getName(),'afterUpdate');
-        TOC_SalesOrderService.updatePaymentMethod((Map<Id,OrderApi__Sales_Order__c>) oldMap,(OrderApi__Sales_Order__c[]) records);
+        TOC_SalesOrderService.updateContactRecord((Map<Id,OrderApi__Sales_Order__c>) oldMap,(OrderApi__Sales_Order__c[]) records);
         Framework.Log.pop();
     }
 
     public override void validate() {
         Framework.Log.push(TOC_SalesOrders.class.getName(),'validate');
+
+        for (OrderApi__Sales_Order__c so : (List<OrderApi__Sales_Order__c>) records) {
+            if (so.OrderApi__Billing_Country__c != null
+                    && so.OrderApi__Billing_Country__c == 'TEST') {
+                so.OrderApi__Billing_Country__c.addError(error('Billing Country can not be TEST',
+                        so, OrderApi__Sales_Order__c.OrderApi__Billing_Country__c));
+            }
+        }
+
         Framework.Log.pop();
     }
 
     public override void validate(Map<Id,SObject> oldMap) {
         Framework.Log.push(TOC_SalesOrders.class.getName(),'validate');
+
+        Map<Id,OrderApi__Sales_Order__c> exMap = (Map<Id,OrderApi__Sales_Order__c>) oldMap;
+
+        for (OrderApi__Sales_Order__c so : (List<OrderApi__Sales_Order__c>) records) {
+            if (so.OrderApi__Billing_Country__c == null
+                    && exMap.get(so.Id).OrderApi__Billing_Country__c != null) {
+                so.OrderApi__Billing_Country__c.addError(error('You can not delete the billing country',
+                        so, OrderApi__Sales_Order__c.OrderApi__Billing_Country__c));
+            }
+        }
+
         Framework.Log.pop();
     }
 }

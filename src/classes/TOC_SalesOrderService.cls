@@ -21,13 +21,11 @@ public class TOC_SalesOrderService {
 
     public static void setDefaults(OrderApi__Sales_Order__c[] records) {
         Framework.Log.push(TOC_SalesOrderService.class.getName(),'setDefaults');
-
         for (OrderApi__Sales_Order__c so : records) {
             if (so.OrderApi__Payment_Method__c != null) {
                 so.OrderApi__Customer_Reference_Number__c = 'Has Payment Method';
             }
         }
-
         Framework.Log.pop();
     }
 
@@ -36,13 +34,14 @@ public class TOC_SalesOrderService {
      * @event afterUpdate
      * @update OrderApi__Sales_Order__c
      */
-    public static void updatePaymentMethod(Map<Id,OrderApi__Sales_Order__c> oldMap, OrderApi__Sales_Order__c[] records) {
-        Framework.Log.push(TOC_SalesOrderService.class.getName(),'updatePaymentMethod');
+    public static void updateContactRecord(Map<Id,OrderApi__Sales_Order__c> oldMap, OrderApi__Sales_Order__c[] records) {
+        Framework.Log.push(TOC_SalesOrderService.class.getName(),'updateContactRecord');
 
         Set <Id> contactIds = new Set<Id>();
 
         for (OrderApi__Sales_Order__c so : records) {
-            if (so.OrderApi__Payment_Method__c != null && so.OrderApi__Contact__c != null) {
+            if (so.OrderApi__Payment_Method__c != null
+                    && so.OrderApi__Contact__c != null) {
                 contactIds.add(so.OrderApi__Contact__c);
             }
         }

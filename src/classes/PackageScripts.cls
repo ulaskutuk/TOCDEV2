@@ -106,6 +106,7 @@ global without sharing class PackageScripts implements InstallHandler, Uninstall
             Framework.Log.push(PackageScripts.Install.class.getName(),'run');
             try {
                 new Register().run();
+                new CustomScripts().run();
                 new Rollups().run();
 
                 registerAppUpdates();
@@ -123,7 +124,7 @@ global without sharing class PackageScripts implements InstallHandler, Uninstall
             // R E G I S T E R I N G     T H E     A P P
             Framework.RegisteredApp toc = new Framework.RegisteredApp();
             toc.namespace = PackageUtils.namespace;
-            toc.name = 'TOC MANAGED PACKAGE';
+            toc.name = 'TOC';
             toc.description = 'Managed Package Developed by TOC';
             toc.isManaged = true;
             toc.isEnabled = true;
@@ -178,10 +179,44 @@ global without sharing class PackageScripts implements InstallHandler, Uninstall
         }
     }
 
-    global class Jobs implements Framework.Scriptable {
+    global class CustomScripts implements Framework.Scriptable {
         global void run() {
-            //SubscriptionBatchable batchSubscriptions = new SubscriptionBatchable(true);
-            //Database.executeBatch(batchSubscriptions,100);
+            Framework.Log.push(PackageScripts.CustomScripts.class.getName(),'run');
+
+            Framework.CustomScript[] customScripts = new List<Framework.CustomScript>();
+
+
+            // Register App, Objects, and Routing Rules
+            Framework.CustomScript cs2 = new Framework.CustomScript();
+            cs2.apexClass = PackageScripts.Register.class.getName();
+            cs2.namespace = PackageUtils.namespace;
+            cs2.name = 'Register App, Custom Objects, and Routing Rules';
+            cs2.description = 'Creates the configurations required for the Fonteva ' +
+                    'Order Management app to operate with the Fonteva Framework.';
+            customScripts.add(cs2);
+
+
+            // Create Rollup Summary Fields
+            Framework.CustomScript cs4 = new Framework.CustomScript();
+            cs4.apexClass = PackageScripts.Rollups.class.getName();
+            cs4.namespace = PackageUtils.namespace;
+            cs4.name = 'Create Rollup Summary Fields';
+            cs4.description = 'Creates the required rollup summary field configurations for the ' +
+                    'Fonteva Order Management app.';
+            customScripts.add(cs4);
+
+            // Run Install Scripts
+            Framework.CustomScript cs5 = new Framework.CustomScript();
+            cs5.apexClass = PackageScripts.Install.class.getName();
+            cs5.namespace = PackageUtils.namespace;
+            cs5.name = 'Run Install Scripts';
+            cs5.description = 'Runs all installation scripts for Fonteva Order Management.';
+            customScripts.add(cs5);
+
+
+            Framework.Config.push(customScripts);
+
+            Framework.Log.pop();
         }
     }
 
@@ -210,10 +245,10 @@ global without sharing class PackageScripts implements InstallHandler, Uninstall
         }
 
 
-        //How to disable
-        Framework.AppUpdate app = Framework.AppUpdate.get('CONTACT UPDATE');
-        app.isActivated = false;
-        Framework.Config.push(app);
+        //How to disable critical updates
+//        Framework.AppUpdate app = Framework.AppUpdate.get('CONTACT UPDATE');
+//        app.isActivated = false;
+//        Framework.Config.push(app);
 
 
     }
